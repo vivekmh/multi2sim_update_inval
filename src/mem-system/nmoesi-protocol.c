@@ -32,7 +32,7 @@
 #include "mem-system.h"
 #include "mod-stack.h"
 #include "prefetcher.h"
-
+#include <string.h>
 
 /* Events */
 
@@ -104,6 +104,7 @@ int EV_MOD_NMOESI_READ_REQUEST_FINISH;
 
 int EV_MOD_NMOESI_INVALIDATE;
 int EV_MOD_NMOESI_INVALIDATE_FINISH;
+int EV_MOD_NMOESI_UPDATE_FINISH;
 
 int EV_MOD_NMOESI_PEER_SEND;
 int EV_MOD_NMOESI_PEER_RECEIVE;
@@ -1883,6 +1884,21 @@ void mod_handler_nmoesi_read_request(int event, void *data)
 			}
 		}
 
+		//VMH
+		if ((strcmp(mod->name, "x86-l2") != 0) && (strcmp(mod->name, "x86-mm") != 0))
+		{
+			for (z = 0; z < dir->zsize; z++)
+			{
+				dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
+				if(dir_entry->counter < 4)
+					dir_entry->counter = dir_entry->counter + 1;
+				else
+					dir_entry->counter = 4;
+				printf("Value of counter: %d\n", dir_entry->counter);
+			}
+		}
+		//VMH
+
 		/* For each sub-block requested by mod, set mod as sharer, and
 		 * check whether there is other cache sharing it. */
 		for (z = 0; z < dir->zsize; z++)
@@ -2449,6 +2465,18 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 			dir_entry_set_sharer(dir, stack->set, stack->way, z, mod->low_net_node->index);
 			dir_entry_set_owner(dir, stack->set, stack->way, z, mod->low_net_node->index);
 			assert(dir_entry->num_sharers == 1);
+			//VMH
+					if ((strcmp(mod->name, "x86-l2") != 0) && (strcmp(mod->name, "x86-mm") != 0))
+					{
+							dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
+							if(dir_entry->counter > 0)
+								dir_entry->counter = dir_entry->counter - 1;
+							else
+								dir_entry->counter = 0;
+							printf("Value of counter: %d\n", dir_entry->counter);
+					}
+			//VMH
+
 		}
 
 		/* Set state to exclusive */
@@ -2725,6 +2753,47 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 			dir_entry_tag = stack->tag + z * mod->sub_block_size;
 			assert(dir_entry_tag < stack->tag + mod->block_size);
 			dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
+			//VMH
+			if(dir_entry->counter > 2)
+			{
+				//write-update
+				for (i = 0; i < dir->num_nodes; i++)
+				{
+					struct net_node_t *node;
+
+					/* Skip non-sharers and 'except_mod' */
+					if (!dir_entry_is_sharer(dir, stack->set, stack->way, z, i))
+						continue;
+
+					node = list_get(mod->high_net->node_list, i);
+					sharer = node->user_data;
+					if (sharer == stack->except_mod)
+						continue;
+
+					/* Clear owner */
+					if (dir_entry->owner == i)
+						dir_entry_set_owner(dir, stack->set, stack->way, z, DIR_ENTRY_OWNER_NONE);
+
+					/*Set and Update sharer*/
+					dir_entry_set_sharer(dir, stack->set, stack->way, z, i);
+					esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, stack, 0);
+
+					/* Send write request upwards if beginning of block */
+					if (dir_entry_tag % sharer->block_size)
+						continue;
+					new_stack = mod_stack_create(stack->id, mod, dir_entry_tag,
+						EV_MOD_NMOESI_UPDATE_FINISH, stack);
+					new_stack->target_mod = sharer;
+					new_stack->request_dir = mod_request_down_up;
+
+					esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
+					stack->pending++;
+				}
+			}
+			//VMH
+			else
+			{
+				//write-invalidate
 			for (i = 0; i < dir->num_nodes; i++)
 			{
 				struct net_node_t *node;
@@ -2754,6 +2823,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 				esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
 				stack->pending++;
 			}
+			}
 		}
 		esim_schedule_event(EV_MOD_NMOESI_INVALIDATE_FINISH, stack, 0);
 		return;
@@ -2778,6 +2848,27 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 		mod_stack_return(stack);
 		return;
 	}
+
+	if (event == EV_MOD_NMOESI_UPDATE_FINISH)
+		{
+			mem_debug("  %lld %lld 0x%x %s update finish\n", esim_time, stack->id,
+				stack->tag, mod->name);
+			mem_trace("mem.access name=\"A-%lld\" state=\"%s:update_finish\"\n",
+				stack->id, mod->name);
+
+			if (stack->reply == reply_ack_data)
+				cache_set_block(mod->cache, stack->set, stack->way, stack->tag,
+					cache_block_shared);
+
+			/* Ignore while pending */
+			assert(stack->pending > 0);
+			stack->pending--;
+			if (stack->pending)
+				return;
+			mod_stack_return(stack);
+			return;
+		}
+
 
 	abort();
 }

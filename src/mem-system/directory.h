@@ -34,6 +34,9 @@ struct dir_lock_t
 struct dir_entry_t
 {
 	int owner;  /* Node owning the block (-1 = No owner)*/
+	//VMH
+	int counter; /*Saturating counter to switch between write-update and write-invalidate*/
+	//VMH
 	int num_sharers;  /* Number of 1s in next field */
 	unsigned char sharer[0];  /* Bitmap of sharers (must be last field) */
 };

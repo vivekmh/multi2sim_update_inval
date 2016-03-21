@@ -265,6 +265,8 @@ void mem_system_init(void)
 			mem_domain_index, "mod_nmoesi_invalidate");
 	EV_MOD_NMOESI_INVALIDATE_FINISH = esim_register_event_with_name(mod_handler_nmoesi_invalidate,
 			mem_domain_index, "mod_nmoesi_invalidate_finish");
+	EV_MOD_NMOESI_UPDATE_FINISH = esim_register_event_with_name(mod_handler_nmoesi_invalidate,
+				mem_domain_index, "mod_nmoesi_update_finish");
 
 	EV_MOD_NMOESI_PEER_SEND = esim_register_event_with_name(mod_handler_nmoesi_peer,
 			mem_domain_index, "mod_nmoesi_peer_send");

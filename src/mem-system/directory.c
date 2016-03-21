@@ -71,6 +71,8 @@ struct dir_t *dir_create(char *name, int xsize, int ysize, int zsize, int num_no
 			{
 				dir_entry = dir_entry_get(dir, x, y, z);
 				dir_entry->owner = DIR_ENTRY_OWNER_NONE;
+				//VMH
+				dir_entry->counter = 0;
 			}
 		}
 	}
