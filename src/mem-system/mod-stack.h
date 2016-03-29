@@ -112,6 +112,8 @@ struct mod_stack_t
 	int retry : 1;
 	int coalesced : 1;
 	int port_locked : 1;
+	// HPS
+	int update : 1;
 
 	/* Message sent through interconnect */
 	struct net_msg_t *msg;

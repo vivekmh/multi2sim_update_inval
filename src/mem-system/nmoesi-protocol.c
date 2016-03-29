@@ -437,12 +437,13 @@ void mod_handler_nmoesi_store(int event, void *data)
 			return;
 		}
 
-		/* Miss - state=O/S/I/N */
+		/* Miss - state=O/S/I/N Update- state=S and dir counter > threshold*/
 		new_stack = mod_stack_create(stack->id, mod, stack->tag,
 			EV_MOD_NMOESI_STORE_UNLOCK, stack);
 		new_stack->peer = mod_stack_set_peer(mod, stack->state);
 		new_stack->target_mod = mod_get_low_mod(mod, stack->tag);
 		new_stack->request_dir = mod_request_up_down;
+		new_stack->update = (stack->state == cache_block_shared || stack->state == cache_block_owned);
 		esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
 
 		/* The prefetcher may be interested in this miss */
@@ -2336,6 +2337,7 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 		new_stack->blocking = stack->request_dir == mod_request_down_up;
 		new_stack->write = 1;
 		new_stack->retry = 0;
+		new_stack->update = stack->update;
 		esim_schedule_event(EV_MOD_NMOESI_FIND_AND_LOCK, new_stack, 0);
 		return;
 	}
@@ -2365,6 +2367,7 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 		new_stack->set = stack->set;
 		new_stack->way = stack->way;
 		new_stack->peer = mod_stack_set_peer(stack->peer, stack->state);
+		new_stack->update = stack->update;
 		esim_schedule_event(EV_MOD_NMOESI_INVALIDATE, new_stack, 0);
 		return;
 	}
@@ -2729,6 +2732,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 
 	uint32_t dir_entry_tag;
 	uint32_t z;
+	//uint32_t num_updated;
 
 	if (event == EV_MOD_NMOESI_INVALIDATE)
 	{
@@ -2754,8 +2758,10 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 			assert(dir_entry_tag < stack->tag + mod->block_size);
 			dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
 			//VMH
-			if(dir_entry->counter > 2)
-			{
+			if(dir_entry->counter > 0 && stack->update)
+			{	// Already updated all sharers
+			    //  if(num_updated > dir->num_nodes-1)
+			    //	continue;
 				//write-update
 				for (i = 0; i < dir->num_nodes; i++)
 				{
@@ -2773,11 +2779,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 					/* Clear owner */
 					if (dir_entry->owner == i)
 						dir_entry_set_owner(dir, stack->set, stack->way, z, DIR_ENTRY_OWNER_NONE);
-
-					/*Set and Update sharer*/
-					dir_entry_set_sharer(dir, stack->set, stack->way, z, i);
-					esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, stack, 0);
-
+					//num_updated++;
 					/* Send write request upwards if beginning of block */
 					if (dir_entry_tag % sharer->block_size)
 						continue;
@@ -2785,7 +2787,8 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 						EV_MOD_NMOESI_UPDATE_FINISH, stack);
 					new_stack->target_mod = sharer;
 					new_stack->request_dir = mod_request_down_up;
-
+					// HPS
+					new_stack->update = stack->update;
 					esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
 					stack->pending++;
 				}
@@ -2797,7 +2800,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 			for (i = 0; i < dir->num_nodes; i++)
 			{
 				struct net_node_t *node;
-				
+				stack->update = 0;
 				/* Skip non-sharers and 'except_mod' */
 				if (!dir_entry_is_sharer(dir, stack->set, stack->way, z, i))
 					continue;
@@ -2819,13 +2822,17 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 					EV_MOD_NMOESI_INVALIDATE_FINISH, stack);
 				new_stack->target_mod = sharer;
 				new_stack->request_dir = mod_request_down_up;
-
+				new_stack->update = stack->update;
 				esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
 				stack->pending++;
 			}
 			}
 		}
-		esim_schedule_event(EV_MOD_NMOESI_INVALIDATE_FINISH, stack, 0);
+
+		if(stack->update)
+			esim_schedule_event(EV_MOD_NMOESI_UPDATE_FINISH, stack, 0);
+		else
+			esim_schedule_event(EV_MOD_NMOESI_INVALIDATE_FINISH, stack, 0);
 		return;
 	}
 
@@ -2863,6 +2870,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 			/* Ignore while pending */
 			assert(stack->pending > 0);
 			stack->pending--;
+			stack->update = 0;
 			if (stack->pending)
 				return;
 			mod_stack_return(stack);
