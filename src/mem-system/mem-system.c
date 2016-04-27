@@ -427,6 +427,8 @@ void mem_system_dump_report(void)
 		fprintf(f, "NoRetryNCWriteHits = %lld\n", mod->no_retry_nc_write_hits);
 		fprintf(f, "NoRetryNCWriteMisses = %lld\n", mod->no_retry_nc_writes
 			- mod->no_retry_nc_write_hits);
+		fprintf(f, "Number of invalidates = %lld\n", mod->inval_counter);
+		fprintf(f, "Number of updates = %lld\n", mod->update_counter);
 		fprintf(f, "\n\n");
 	}
 

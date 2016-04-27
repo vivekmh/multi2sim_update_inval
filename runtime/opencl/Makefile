@@ -91,22 +91,22 @@ am____top_builddir__lib_libm2s_opencl_la_SOURCES_DIST = command.c \
 	even-partition-strategy.c even-partition-strategy.h \
 	relative-runtime-partition-strategy.c \
 	relative-runtime-partition-strategy.h x86-device-wi.s
-#am___top_builddir__lib_libm2s_opencl_la_OBJECTS =  \
-#	command.lo command-queue.lo context.lo \
-#	debug.lo device.lo elf-format.lo event.lo \
-#	evg-device.lo evg-kernel.lo evg-program.lo \
-#	list.lo mhandle.lo misc.lo program.lo \
-#	kernel.lo mem.lo object.lo opencl.lo \
-#	platform.lo sampler.lo si-device.lo \
-#	si-kernel.lo si-program.lo string.lo \
-#	thread-list.lo x86-device.lo x86-kernel.lo \
-#	x86-program.lo union-device.lo \
-#	union-kernel.lo union-program.lo \
-#	partition-strategy.lo partition-util.lo \
-#	partition-util-time.lo \
-#	even-partition-strategy.lo \
-#	relative-runtime-partition-strategy.lo \
-#	x86-device-wi.lo
+am___top_builddir__lib_libm2s_opencl_la_OBJECTS =  \
+	command.lo command-queue.lo context.lo \
+	debug.lo device.lo elf-format.lo event.lo \
+	evg-device.lo evg-kernel.lo evg-program.lo \
+	list.lo mhandle.lo misc.lo program.lo \
+	kernel.lo mem.lo object.lo opencl.lo \
+	platform.lo sampler.lo si-device.lo \
+	si-kernel.lo si-program.lo string.lo \
+	thread-list.lo x86-device.lo x86-kernel.lo \
+	x86-program.lo union-device.lo \
+	union-kernel.lo union-program.lo \
+	partition-strategy.lo partition-util.lo \
+	partition-util-time.lo \
+	even-partition-strategy.lo \
+	relative-runtime-partition-strategy.lo \
+	x86-device-wi.lo
 __top_builddir__lib_libm2s_opencl_la_OBJECTS =  \
 	$(am___top_builddir__lib_libm2s_opencl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -117,8 +117,8 @@ __top_builddir__lib_libm2s_opencl_la_LINK = $(LIBTOOL) $(AM_V_lt) \
 	$(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(__top_builddir__lib_libm2s_opencl_la_LDFLAGS) $(LDFLAGS) -o \
 	$@
-#am___top_builddir__lib_libm2s_opencl_la_rpath =  \
-#	-rpath $(libdir)
+am___top_builddir__lib_libm2s_opencl_la_rpath =  \
+	-rpath $(libdir)
 am__dirstamp = $(am__leading_dot)dirstamp
 DEFAULT_INCLUDES = 
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -159,20 +159,20 @@ DIST_SOURCES =  \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/vivek/workspace/multi2sim/missing --run aclocal-1.11
+ACLOCAL = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run aclocal-1.11
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-AUTOCONF = ${SHELL} /home/vivek/workspace/multi2sim/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/vivek/workspace/multi2sim/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/vivek/workspace/multi2sim/missing --run automake-1.11
+AUTOCONF = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run automake-1.11
 AWK = mawk
 CC = gcc
 CCAS = gcc
 CCASDEPMODE = depmode=gcc3
 CCASFLAGS = -g -O2
 CCDEPMODE = depmode=gcc3
-CFLAGS = -msse2 -Wall -Werror -DMHANDLE -g -O0 -std=gnu99 -Wno-error=deprecated-declarations
+CFLAGS = -msse2 -O3 -std=gnu99 -DNDEBUG
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
@@ -216,7 +216,7 @@ LLVM_LIBS =
 LN_S = ln -s
 LTLIBOBJS = 
 M2S_INCLUDES =  -I$(top_srcdir) -I$(top_srcdir)/src 
-MAKEINFO = ${SHELL} /home/vivek/workspace/multi2sim/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -244,10 +244,10 @@ STRIP = strip
 VERSION = 4.2
 YACC = yacc
 YFLAGS = 
-abs_builddir = /home/vivek/workspace/multi2sim/runtime/opencl
-abs_srcdir = /home/vivek/workspace/multi2sim/runtime/opencl
-abs_top_builddir = /home/vivek/workspace/multi2sim
-abs_top_srcdir = /home/vivek/workspace/multi2sim
+abs_builddir = /home/vivek/workspace/m2s_update_inval/runtime/opencl
+abs_srcdir = /home/vivek/workspace/m2s_update_inval/runtime/opencl
+abs_top_builddir = /home/vivek/workspace/m2s_update_inval
+abs_top_srcdir = /home/vivek/workspace/m2s_update_inval
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -277,7 +277,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/vivek/workspace/multi2sim/install-sh
+install_sh = ${SHELL} /home/vivek/workspace/m2s_update_inval/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -297,122 +297,122 @@ target_alias =
 top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
-#lib_LTLIBRARIES = $(top_builddir)/lib/libm2s-opencl.la
-#__top_builddir__lib_libm2s_opencl_la_LDFLAGS = -version-info 1:0:0 -lpthread -ldl -lrt
-#__top_builddir__lib_libm2s_opencl_la_SOURCES = \
-#	\
-#	command.c \
-#	command.h \
-#	\
-#	command-queue.c \
-#	command-queue.h \
-#	\
-#	context.c \
-#	context.h \
-#	\
-#	debug.c \
-#	debug.h \
-#	\
-#	device.c \
-#	device.h \
-#	\
-#	elf-format.c \
-#	elf-format.h \
-#	\
-#	event.c \
-#	event.h \
-#	\
-#	evg-device.c \
-#	evg-device.h \
-#	\
-#	evg-kernel.c \
-#	evg-kernel.h \
-#	\
-#	evg-program.c \
-#	evg-program.h \
-#	\
-#	list.c \
-#	list.h \
-#	\
-#	mhandle.c \
-#	mhandle.h \
-#	\
-#	misc.c \
-#	misc.h \
-#	\
-#	program.c \
-#	program.h \
-#	\
-#	kernel.c \
-#	kernel.h \
-#	\
-#	mem.c \
-#	mem.h \
-#	\
-#	object.c \
-#	object.h \
-#	\
-#	opencl.c \
-#	opencl.h \
-#	\
-#	platform.c \
-#	platform.h \
-#	\
-#	sampler.c \
-#	sampler.h \
-#	\
-#	si-device.c \
-#	si-device.h \
-#	\
-#	si-kernel.c \
-#	si-kernel.h \
-#	\
-#	si-program.c \
-#	si-program.h \
-#	\
-#	string.c \
-#	string.h \
-#	\
-#	thread-list.c \
-#	thread-list.h \
-#	\
-#	x86-device.c \
-#	x86-device.h \
-#	\
-#	x86-kernel.c \
-#	x86-kernel.h \
-#	\
-#	x86-program.c \
-#	x86-program.h \
-#	\
-#	union-device.c \
-#	union-device.h \
-#	\
-#	union-kernel.c \
-#	union-kernel.h \
-#	\
-#	union-program.c \
-#	union-program.h \
-#	\
-#	partition-strategy.c \
-#	partition-strategy.h \
-#	\
-#	partition-util.c \
-#	partition-util.h \
-#	\
-#	partition-util-time.c \
-#	partition-util-time.h \
-#	\
-#	even-partition-strategy.c \
-#	even-partition-strategy.h \
-#	\
-#	relative-runtime-partition-strategy.c \
-#	relative-runtime-partition-strategy.h \
-#	\
-#	x86-device-wi.s
+lib_LTLIBRARIES = $(top_builddir)/lib/libm2s-opencl.la
+__top_builddir__lib_libm2s_opencl_la_LDFLAGS = -version-info 1:0:0 -lpthread -ldl -lrt
+__top_builddir__lib_libm2s_opencl_la_SOURCES = \
+	\
+	command.c \
+	command.h \
+	\
+	command-queue.c \
+	command-queue.h \
+	\
+	context.c \
+	context.h \
+	\
+	debug.c \
+	debug.h \
+	\
+	device.c \
+	device.h \
+	\
+	elf-format.c \
+	elf-format.h \
+	\
+	event.c \
+	event.h \
+	\
+	evg-device.c \
+	evg-device.h \
+	\
+	evg-kernel.c \
+	evg-kernel.h \
+	\
+	evg-program.c \
+	evg-program.h \
+	\
+	list.c \
+	list.h \
+	\
+	mhandle.c \
+	mhandle.h \
+	\
+	misc.c \
+	misc.h \
+	\
+	program.c \
+	program.h \
+	\
+	kernel.c \
+	kernel.h \
+	\
+	mem.c \
+	mem.h \
+	\
+	object.c \
+	object.h \
+	\
+	opencl.c \
+	opencl.h \
+	\
+	platform.c \
+	platform.h \
+	\
+	sampler.c \
+	sampler.h \
+	\
+	si-device.c \
+	si-device.h \
+	\
+	si-kernel.c \
+	si-kernel.h \
+	\
+	si-program.c \
+	si-program.h \
+	\
+	string.c \
+	string.h \
+	\
+	thread-list.c \
+	thread-list.h \
+	\
+	x86-device.c \
+	x86-device.h \
+	\
+	x86-kernel.c \
+	x86-kernel.h \
+	\
+	x86-program.c \
+	x86-program.h \
+	\
+	union-device.c \
+	union-device.h \
+	\
+	union-kernel.c \
+	union-kernel.h \
+	\
+	union-program.c \
+	union-program.h \
+	\
+	partition-strategy.c \
+	partition-strategy.h \
+	\
+	partition-util.c \
+	partition-util.h \
+	\
+	partition-util-time.c \
+	partition-util-time.h \
+	\
+	even-partition-strategy.c \
+	even-partition-strategy.h \
+	\
+	relative-runtime-partition-strategy.c \
+	relative-runtime-partition-strategy.h \
+	\
+	x86-device-wi.s
 
-#AM_CFLAGS = -m32 -D_GNU_SOURCE
-#AM_CCASFLAGS = -m32
+AM_CFLAGS = -m32 -D_GNU_SOURCE
+AM_CCASFLAGS = -m32
 all: all-am
 
 .SUFFIXES:

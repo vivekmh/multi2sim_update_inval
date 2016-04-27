@@ -75,8 +75,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 __top_builddir__lib_libm2s_glew_la_LIBADD =
 am____top_builddir__lib_libm2s_glew_la_SOURCES_DIST = api.c api.h \
 	debug.c debug.h mhandle.c mhandle.h
-#am___top_builddir__lib_libm2s_glew_la_OBJECTS =  \
-#	api.lo debug.lo mhandle.lo
+am___top_builddir__lib_libm2s_glew_la_OBJECTS =  \
+	api.lo debug.lo mhandle.lo
 __top_builddir__lib_libm2s_glew_la_OBJECTS =  \
 	$(am___top_builddir__lib_libm2s_glew_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -86,8 +86,8 @@ __top_builddir__lib_libm2s_glew_la_LINK = $(LIBTOOL) $(AM_V_lt) \
 	--tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
 	$(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(__top_builddir__lib_libm2s_glew_la_LDFLAGS) $(LDFLAGS) -o $@
-#am___top_builddir__lib_libm2s_glew_la_rpath =  \
-#	-rpath $(libdir)
+am___top_builddir__lib_libm2s_glew_la_rpath =  \
+	-rpath $(libdir)
 am__dirstamp = $(am__leading_dot)dirstamp
 DEFAULT_INCLUDES = 
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -120,20 +120,20 @@ DIST_SOURCES = $(am____top_builddir__lib_libm2s_glew_la_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/vivek/workspace/multi2sim/missing --run aclocal-1.11
+ACLOCAL = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run aclocal-1.11
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-AUTOCONF = ${SHELL} /home/vivek/workspace/multi2sim/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/vivek/workspace/multi2sim/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/vivek/workspace/multi2sim/missing --run automake-1.11
+AUTOCONF = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run automake-1.11
 AWK = mawk
 CC = gcc
 CCAS = gcc
 CCASDEPMODE = depmode=gcc3
 CCASFLAGS = -g -O2
 CCDEPMODE = depmode=gcc3
-CFLAGS = -msse2 -Wall -Werror -DMHANDLE -g -O0 -std=gnu99 -Wno-error=deprecated-declarations
+CFLAGS = -msse2 -O3 -std=gnu99 -DNDEBUG
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
@@ -177,7 +177,7 @@ LLVM_LIBS =
 LN_S = ln -s
 LTLIBOBJS = 
 M2S_INCLUDES =  -I$(top_srcdir) -I$(top_srcdir)/src 
-MAKEINFO = ${SHELL} /home/vivek/workspace/multi2sim/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/vivek/workspace/m2s_update_inval/missing --run makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -205,10 +205,10 @@ STRIP = strip
 VERSION = 4.2
 YACC = yacc
 YFLAGS = 
-abs_builddir = /home/vivek/workspace/multi2sim/runtime/glew
-abs_srcdir = /home/vivek/workspace/multi2sim/runtime/glew
-abs_top_builddir = /home/vivek/workspace/multi2sim
-abs_top_srcdir = /home/vivek/workspace/multi2sim
+abs_builddir = /home/vivek/workspace/m2s_update_inval/runtime/glew
+abs_srcdir = /home/vivek/workspace/m2s_update_inval/runtime/glew
+abs_top_builddir = /home/vivek/workspace/m2s_update_inval
+abs_top_srcdir = /home/vivek/workspace/m2s_update_inval
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -238,7 +238,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/vivek/workspace/multi2sim/install-sh
+install_sh = ${SHELL} /home/vivek/workspace/m2s_update_inval/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -258,20 +258,20 @@ target_alias =
 top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
-#lib_LTLIBRARIES = $(top_builddir)/lib/libm2s-glew.la
-#__top_builddir__lib_libm2s_glew_la_LDFLAGS = -version-info 1:0:0
-#__top_builddir__lib_libm2s_glew_la_SOURCES = \
-#	\
-#	api.c \
-#	api.h \
-#	\
-#	debug.c \
-#	debug.h \
-#	\
-#	mhandle.c \
-#	mhandle.h
+lib_LTLIBRARIES = $(top_builddir)/lib/libm2s-glew.la
+__top_builddir__lib_libm2s_glew_la_LDFLAGS = -version-info 1:0:0
+__top_builddir__lib_libm2s_glew_la_SOURCES = \
+	\
+	api.c \
+	api.h \
+	\
+	debug.c \
+	debug.h \
+	\
+	mhandle.c \
+	mhandle.h
 
-#AM_CFLAGS = -m32
+AM_CFLAGS = -m32
 all: all-am
 
 .SUFFIXES:

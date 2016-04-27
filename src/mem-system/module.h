@@ -92,6 +92,7 @@ struct mod_t
 	int dir_latency;
 	int mshr_size;
 
+
 	/* Module level starting from entry points */
 	int level;
 
@@ -231,6 +232,8 @@ struct mod_t
 	long long no_retry_write_hits;
 	long long no_retry_nc_writes;
 	long long no_retry_nc_write_hits;
+	long long update_counter;
+	long long inval_counter;
 };
 
 struct mod_t *mod_create(char *name, enum mod_kind_t kind, int num_ports,

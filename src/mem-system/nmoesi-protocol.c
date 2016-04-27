@@ -129,7 +129,15 @@ void mod_handler_nmoesi_load(int event, void *data)
 	struct mod_stack_t *new_stack;
 
 	struct mod_t *mod = stack->mod;
+	struct mod_t *target_mod = stack->target_mod;
 
+	struct dir_t *dir;
+	struct dir_entry_t *dir_entry;
+
+	//struct dir_t *dir_target;
+	//struct dir_entry_t *dir_entry_target;
+
+	uint32_t z;
 
 	if (event == EV_MOD_NMOESI_LOAD)
 	{
@@ -284,6 +292,30 @@ void mod_handler_nmoesi_load(int event, void *data)
 		mem_trace("mem.access name=\"A-%lld\" state=\"%s:load_unlock\"\n",
 			stack->id, mod->name);
 
+
+		//printf("update counter for %s",target_mod->name);
+		dir = mod->dir;
+		//dir_target = target_mod->dir;
+
+		for (z = 0; z < dir->zsize; z++)
+		{
+			dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
+			if(dir_entry->counter < 4)
+				dir_entry->counter = dir_entry->counter + 1;
+			else
+				dir_entry->counter = 4;
+			//printf("Value of counter: %d\n", dir_entry->counter);
+		}
+
+		/*for (z=0; z < dir_target->zsize; z++)
+		{
+			dir_entry_target = dir_entry_get(dir_target, stack->set, stack->way, z);
+			if(dir_entry_target->counter < 4)
+				dir_entry_target->counter = dir_entry_target->counter + 1;
+			else
+				dir_entry_target->counter = 4;
+
+		}*/
 		/* Unlock directory entry */
 		dir_entry_unlock(mod->dir, stack->set, stack->way);
 
@@ -332,7 +364,15 @@ void mod_handler_nmoesi_store(int event, void *data)
 	struct mod_stack_t *new_stack;
 
 	struct mod_t *mod = stack->mod;
+	struct mod_t *target_mod = stack->target_mod;
 
+	struct dir_t *dir;
+	struct dir_entry_t *dir_entry;
+
+	//struct dir_t *dir_target;
+	//struct dir_entry_t *dir_entry_target;
+
+	uint32_t z;
 
 	if (event == EV_MOD_NMOESI_STORE)
 	{
@@ -443,7 +483,9 @@ void mod_handler_nmoesi_store(int event, void *data)
 		new_stack->peer = mod_stack_set_peer(mod, stack->state);
 		new_stack->target_mod = mod_get_low_mod(mod, stack->tag);
 		new_stack->request_dir = mod_request_up_down;
-		new_stack->update = (stack->state == cache_block_shared || stack->state == cache_block_owned);
+		new_stack->update = (stack->state == cache_block_shared || stack->state == cache_block_owned) ? 1 : 0;
+		if(new_stack->update)
+			printf("store %s, stack-update= %d, state =%d, tag=%d\n",mod->name,new_stack->update,stack->state, stack->tag);
 		esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
 
 		/* The prefetcher may be interested in this miss */
@@ -473,10 +515,58 @@ void mod_handler_nmoesi_store(int event, void *data)
 			return;
 		}
 
+		//printf("update counter for %s",target_mod->name);
+		dir = mod->dir;
+		//dir_target = target_mod->dir;
+
+		for (z = 0; z < dir->zsize; z++)
+		{
+			dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
+			if(dir_entry->counter > 0)
+				dir_entry->counter = dir_entry->counter - 1;
+			else
+				dir_entry->counter = 0;
+					//printf("Value of counter: %d\n", dir_entry->counter);
+		}
+
+		//struct dir_lock_t *dir_lock;
+		/* Get lock */
+		//assert(stack->set < dir_target->xsize && stack->way < dir_target->ysize);
+		//dir_lock = &dir_target->dir_lock[stack->set * dir_target->ysize + stack->way];
+
+
+		/* Lock entry */
+		//dir_lock->lock = 1;
+		//dir_lock->stack_id = stack->id;
+
+		/*for (z=0; z < dir_target->zsize; z++)
+		{
+			dir_entry_target = dir_entry_get(dir_target, stack->set, stack->way, z);
+			if(dir_entry_target->counter > 0)
+				dir_entry_target->counter = dir_entry_target->counter - 1;
+			else
+				dir_entry_target->counter = 0;
+
+		}*/
+
+		//HPS- if update, the block will continue to be in shared state
 		/* Update tag/state and unlock */
-		cache_set_block(mod->cache, stack->set, stack->way,
-			stack->tag, cache_block_modified);
+		if(stack->update)
+			cache_set_block(mod->cache, stack->set, stack->way,
+				stack->tag, cache_block_shared);
+		else
+			cache_set_block(mod->cache, stack->set, stack->way,
+				stack->tag, cache_block_modified);
+		//dir_entry_unlock(target_mod->dir, stack->set, stack->way);
 		dir_entry_unlock(mod->dir, stack->set, stack->way);
+
+		/*if(stack->update)
+		{
+			mem_debug("  %lld %lld 0x%x %s store update %d \n", esim_time, stack->id,
+						stack->addr, mod->name, mod->cache->sets[4]->blocks->way[0]);
+		}*/
+
+		stack->update = 0;
 
 		/* Impose the access latency before continuing */
 		esim_schedule_event(EV_MOD_NMOESI_STORE_FINISH, stack, 
@@ -486,8 +576,8 @@ void mod_handler_nmoesi_store(int event, void *data)
 
 	if (event == EV_MOD_NMOESI_STORE_FINISH)
 	{
-		mem_debug("%lld %lld 0x%x %s store finish\n", esim_time, stack->id,
-			stack->addr, mod->name);
+		mem_debug("%lld %lld 0x%x %s store finish state=%s\n", esim_time, stack->id,
+			stack->addr, mod->name,str_map_value(&cache_block_state_map, mod->cache->sets->blocks->state));
 		mem_trace("mem.access name=\"A-%lld\" state=\"%s:store_finish\"\n",
 			stack->id, mod->name);
 		mem_trace("mem.end_access name=\"A-%lld\"\n",
@@ -1886,8 +1976,8 @@ void mod_handler_nmoesi_read_request(int event, void *data)
 		}
 
 		//VMH
-		if ((strcmp(mod->name, "x86-l2") != 0) && (strcmp(mod->name, "x86-mm") != 0))
-		{
+		//if ((strcmp(mod->name, "x86-l2") != 0) && (strcmp(mod->name, "x86-mm") != 0))
+		//{
 			for (z = 0; z < dir->zsize; z++)
 			{
 				dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
@@ -1895,9 +1985,9 @@ void mod_handler_nmoesi_read_request(int event, void *data)
 					dir_entry->counter = dir_entry->counter + 1;
 				else
 					dir_entry->counter = 4;
-				printf("Value of counter: %d\n", dir_entry->counter);
+				//printf("Value of counter: %d\n", dir_entry->counter);
 			}
-		}
+		//}
 		//VMH
 
 		/* For each sub-block requested by mod, set mod as sharer, and
@@ -2368,7 +2458,11 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 		new_stack->way = stack->way;
 		new_stack->peer = mod_stack_set_peer(stack->peer, stack->state);
 		new_stack->update = stack->update;
-		esim_schedule_event(EV_MOD_NMOESI_INVALIDATE, new_stack, 0);
+		if(new_stack->update)
+		{
+			printf("calling from write req action to invalidate :new_stack=%s, stack->state=%d\n",new_stack->mod->name,new_stack->state);
+		}
+	    esim_schedule_event(EV_MOD_NMOESI_INVALIDATE, new_stack, 0);
 		return;
 	}
 
@@ -2467,18 +2561,19 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 			dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
 			dir_entry_set_sharer(dir, stack->set, stack->way, z, mod->low_net_node->index);
 			dir_entry_set_owner(dir, stack->set, stack->way, z, mod->low_net_node->index);
-			assert(dir_entry->num_sharers == 1);
+			if(!stack->update)
+				assert(dir_entry->num_sharers == 1);
 			//VMH
-					if ((strcmp(mod->name, "x86-l2") != 0) && (strcmp(mod->name, "x86-mm") != 0))
-					{
+				//	if ((strcmp(mod->name, "x86-l2") != 0) && (strcmp(mod->name, "x86-mm") != 0))
+					//{
 							dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
 							if(dir_entry->counter > 0)
 								dir_entry->counter = dir_entry->counter - 1;
 							else
 								dir_entry->counter = 0;
-							printf("Value of counter: %d\n", dir_entry->counter);
-					}
-			//VMH
+							//printf("Value of counter: %d\n", dir_entry->counter);
+					//}
+			//VMH*/
 
 		}
 
@@ -2512,13 +2607,16 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 
 	if (event == EV_MOD_NMOESI_WRITE_REQUEST_DOWNUP)
 	{
-		mem_debug("  %lld %lld 0x%x %s write request downup\n", esim_time, stack->id,
-			stack->tag, target_mod->name);
+		mem_debug("  %lld %lld 0x%x %s write request downup stack_ state=%s\n", esim_time, stack->id,
+			stack->tag, target_mod->name,str_map_value(&cache_block_state_map, stack->state));
 		mem_trace("mem.access name=\"A-%lld\" state=\"%s:write_request_downup\"\n",
 			stack->id, target_mod->name);
-
+		//printf("stack->state= %d",stack->state);
+		if(!stack->update)
+		{
 		assert(stack->state != cache_block_invalid);
 		assert(!dir_entry_group_shared_or_owned(target_mod->dir, stack->set, stack->way));
+		}
 
 		/* Compute reply size */	
 		if (stack->state == cache_block_exclusive || 
@@ -2567,6 +2665,7 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 		}
 		else 
 		{
+			printf("invalidated the %s with tag %d\n",mod->name, stack->tag);
 			fatal("Invalid cache block state: %d\n", stack->state);
 		}
 
@@ -2582,8 +2681,15 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 		mem_trace("mem.access name=\"A-%lld\" state=\"%s:write_request_downup_finish\"\n",
 			stack->id, target_mod->name);
 
-		/* Set state to I, unlock*/
-		cache_set_block(target_mod->cache, stack->set, stack->way, 0, cache_block_invalid);
+		/* Keep state as shared for update, for invalidate: Set state to I, unlock*/
+		if(stack->update)
+			cache_set_block(target_mod->cache, stack->set, stack->way, stack->tag, cache_block_shared);
+		else
+			cache_set_block(target_mod->cache, stack->set, stack->way, 0, cache_block_invalid);
+
+		mem_debug("  %lld %lld 0x%x %s write request downup complete with new state=%s\n", esim_time, stack->id,
+					stack->tag, target_mod->name,str_map_value(&cache_block_state_map, stack->state));
+
 		dir_entry_unlock(target_mod->dir, stack->set, stack->way);
 
 		int latency = ret->reply == reply_ack_data_sent_to_peer ? 0 : target_mod->latency;
@@ -2643,7 +2749,7 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 			net_receive(mod->high_net, mod->high_net_node, stack->msg);
 		}
 		
-
+		//printf("completed write req for module %s\n",stack->mod->name);
 		/* Return */
 		mod_stack_return(stack);
 		return;
@@ -2758,16 +2864,16 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 			assert(dir_entry_tag < stack->tag + mod->block_size);
 			dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
 			//VMH
-			if(dir_entry->counter > 0 && stack->update)
-			{	// Already updated all sharers
-			    //  if(num_updated > dir->num_nodes-1)
-			    //	continue;
-				//write-update
+			if(dir_entry->counter > 2 && stack->update)
+				{
+				//printf("counter=%d\n", dir_entry->counter);
+
+				printf("in update\n");
 				for (i = 0; i < dir->num_nodes; i++)
 				{
 					struct net_node_t *node;
-
-					/* Skip non-sharers and 'except_mod' */
+					mod->update_counter++;
+					 //Skip non-sharers and 'except_mod'
 					if (!dir_entry_is_sharer(dir, stack->set, stack->way, z, i))
 						continue;
 
@@ -2776,11 +2882,11 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 					if (sharer == stack->except_mod)
 						continue;
 
-					/* Clear owner */
+
 					if (dir_entry->owner == i)
 						dir_entry_set_owner(dir, stack->set, stack->way, z, DIR_ENTRY_OWNER_NONE);
 					//num_updated++;
-					/* Send write request upwards if beginning of block */
+					//Send write request upwards if beginning of block
 					if (dir_entry_tag % sharer->block_size)
 						continue;
 					new_stack = mod_stack_create(stack->id, mod, dir_entry_tag,
@@ -2790,6 +2896,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 					// HPS
 					new_stack->update = stack->update;
 					esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
+					printf("scheduled write request for %s, i= %d, state=%d\n", new_stack->target_mod->name,i,new_stack->state);
 					stack->pending++;
 				}
 			}
@@ -2800,7 +2907,9 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 			for (i = 0; i < dir->num_nodes; i++)
 			{
 				struct net_node_t *node;
+				//HPS- forcing update=0
 				stack->update = 0;
+				mod->inval_counter++;
 				/* Skip non-sharers and 'except_mod' */
 				if (!dir_entry_is_sharer(dir, stack->set, stack->way, z, i))
 					continue;
@@ -2810,14 +2919,25 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 				if (sharer == stack->except_mod)
 					continue;
 
-				/* Clear sharer and owner */
-				dir_entry_clear_sharer(dir, stack->set, stack->way, z, i);
+				mem_debug("  %lld %lld 0x%x %s invalidate true sharer(set=%d, way=%d, state=%s, owner=%d, sharer=%d)\n", esim_time, stack->id,
+											stack->tag, mod->name, stack->set, stack->way,
+											str_map_value(&cache_block_state_map,stack->state), dir_entry->owner,i);
+
+				/* Clear sharer for invalidate and owner */
+				//if(!(dir_entry->counter >= 3 && stack->update))
+					dir_entry_clear_sharer(dir, stack->set, stack->way, z, i);
+
 				if (dir_entry->owner == i)
 					dir_entry_set_owner(dir, stack->set, stack->way, z, DIR_ENTRY_OWNER_NONE);
 
 				/* Send write request upwards if beginning of block */
 				if (dir_entry_tag % sharer->block_size)
 					continue;
+				/*if(dir_entry->counter >= 3 && stack->update)
+					mod->update_counter++;
+				else
+					mod->inval_counter++;
+				*/
 				new_stack = mod_stack_create(stack->id, mod, dir_entry_tag,
 					EV_MOD_NMOESI_INVALIDATE_FINISH, stack);
 				new_stack->target_mod = sharer;
@@ -2826,8 +2946,8 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 				esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
 				stack->pending++;
 			}
-			}
 		}
+	}
 
 		if(stack->update)
 			esim_schedule_event(EV_MOD_NMOESI_UPDATE_FINISH, stack, 0);
@@ -2856,23 +2976,27 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 		return;
 	}
 
-	if (event == EV_MOD_NMOESI_UPDATE_FINISH)
+	if (event == EV_MOD_NMOESI_UPDATE_FINISH)// need to change reply size also??
 		{
-			mem_debug("  %lld %lld 0x%x %s update finish\n", esim_time, stack->id,
-				stack->tag, mod->name);
+			//mem_debug("  %lld %lld 0x%x %s update finish with state %s\n", esim_time, stack->id,
+				//stack->tag, mod->name,str_map_value(&cache_block_state_map, stack->state));
 			mem_trace("mem.access name=\"A-%lld\" state=\"%s:update_finish\"\n",
 				stack->id, mod->name);
 
-			if (stack->reply == reply_ack_data)
+			//if (stack->reply == reply_ack_data)
 				cache_set_block(mod->cache, stack->set, stack->way, stack->tag,
 					cache_block_shared);
 
 			/* Ignore while pending */
 			assert(stack->pending > 0);
 			stack->pending--;
-			stack->update = 0;
+
+			printf("stack->reply=%d, update finish %s, pending=%d, stack->state=%d\n",stack->reply, stack->mod->name,stack->pending,stack->state);
+			mem_debug("  %lld %lld 0x%x %s update finish with state %s\n", esim_time, stack->id,
+							stack->tag, mod->name,str_map_value(&cache_block_state_map, stack->state));
 			if (stack->pending)
 				return;
+			stack->update = 0;
 			mod_stack_return(stack);
 			return;
 		}

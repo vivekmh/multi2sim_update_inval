@@ -12,6 +12,8 @@ branch-unit.o: branch-unit.c /usr/include/stdc-predef.h \
  /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio2.h \
  ../../../../src/arch/southern-islands/asm/asm.dat \
  ../../../../src/lib/esim/trace.h ../../../../src/lib/util/list.h \
  branch-unit.h compute-unit.h lds-unit.h scalar-unit.h vector-mem-unit.h \
@@ -55,6 +57,10 @@ branch-unit.o: branch-unit.c /usr/include/stdc-predef.h \
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/sys_errlist.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:
 
 ../../../../src/arch/southern-islands/asm/asm.dat:
 
