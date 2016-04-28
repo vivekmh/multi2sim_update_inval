@@ -139,7 +139,7 @@ CCAS = gcc
 CCASDEPMODE = depmode=gcc3
 CCASFLAGS = -g -O2
 CCDEPMODE = depmode=gcc3
-CFLAGS = -msse2 -O3 -std=gnu99 -DNDEBUG
+CFLAGS = -msse2 -Wall -Werror -DMHANDLE -g -O0 -std=gnu99 -Wno-error=deprecated-declarations
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++

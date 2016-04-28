@@ -1,0 +1,71 @@
+
+; Multi2Sim 4.2 - A Simulation Framework for CPU-GPU Heterogeneous Computing
+; Please use command 'm2s --help' for a list of command-line options.
+; Simulation alpha-numeric ID: kxrax
+
+
+Ocean simulation with W-cycle multigrid solver
+    Processors                         : 2
+    Grid size                          : 2050 x 2050
+    Grid resolution (meters)           : 20000.00
+    Time between relaxations (seconds) : 28800
+    Error tolerance                    : 1e-07
+
+store mod-l1-1, stack-update= 1, state =5, tag=782080
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-0, stack->state=0
+store mod-l1-1, stack-update= 1, state =5, tag=524032
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-0, stack->state=0
+==> created thread 1
+store mod-l1-0, stack-update= 1, state =3, tag=30976
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-1, stack->state=0
+store mod-l1-0, stack-update= 1, state =5, tag=782080
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-1, stack->state=0
+store mod-l1-0, stack-update= 1, state =5, tag=524032
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-1, stack->state=0
+store mod-l1-0, stack-update= 1, state =5, tag=807424
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-1, stack->state=0
+store mod-l1-1, stack-update= 1, state =5, tag=807424
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-0, stack->state=0
+store mod-l1-0, stack-update= 1, state =5, tag=807424
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-1, stack->state=0
+store mod-l1-1, stack-update= 1, state =5, tag=807424
+calling from write req action to invalidate :new_stack=mod-l2, stack->state=0
+calling from write req action to invalidate :new_stack=mod-l1-0, stack->state=0
+
+;
+; Simulation Statistics Summary
+;
+
+[ General ]
+RealTime = 259.17 [s]
+SimEnd = x86MaxInst
+SimTime = 40808625.00 [ns]
+Frequency = 1000 [MHz]
+Cycles = 40808626
+
+[ x86 ]
+RealTime = 259.17 [s]
+Instructions = 20473465
+InstructionsPerSecond = 78996
+Contexts = 2
+Memory = 949166080
+FastForwardInstructions = 0
+CommittedInstructions = 20000002
+CommittedInstructionsPerCycle = 0.4901
+CommittedMicroInstructions = 42471784
+CommittedMicroInstructionsPerCycle = 1.041
+BranchPredictionAccuracy = 0.9968
+SimTime = 40808514.00 [ns]
+Frequency = 1000 [MHz]
+Cycles = 40808514
+CyclesPerSecond = 157459
+
+
