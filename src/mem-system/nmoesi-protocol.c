@@ -1258,6 +1258,26 @@ void mod_handler_nmoesi_find_and_lock(int event, void *data)
 		cache_set_transient_tag(mod->cache, stack->set, stack->way, stack->tag);
 		cache_access_block(mod->cache, stack->set, stack->way);
 
+		struct mod_t *parent_mod;
+
+		/* Get high/parent module */
+		parent_mod = linked_list_get(mod->high_mod_list);
+
+		//VMH
+		//Also update remote_flag here
+		if(stack->hit && !strncmp(mod->name,"mod-l2",6))
+		{
+			int len = strlen(mod->name);
+			int len_upper = strlen(parent_mod->name);
+			const char *last_two = &mod->name[len-2];
+			const char *last_two_upper = &parent_mod->name[len_upper-2];
+			if(strcmp(last_two,last_two_upper))
+				stack->remote_flag = 1;
+			printf("Mod name %s, Parent mod name %s remote_flag %d\n", mod->name, parent_mod->name,
+					stack->remote_flag);
+		}
+		//VMH
+
 		/* Access latency */
 		esim_schedule_event(EV_MOD_NMOESI_FIND_AND_LOCK_ACTION, stack, mod->dir_latency);
 		return;
@@ -2864,7 +2884,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 			assert(dir_entry_tag < stack->tag + mod->block_size);
 			dir_entry = dir_entry_get(dir, stack->set, stack->way, z);
 			//VMH
-			if(dir_entry->counter > 2 && stack->update)
+			if(dir_entry->counter > 1 && stack->update)
 				{
 				//printf("counter=%d\n", dir_entry->counter);
 

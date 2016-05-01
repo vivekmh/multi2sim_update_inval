@@ -48,6 +48,7 @@ struct mod_stack_t *mod_stack_create(long long id, struct mod_t *mod,
 	stack->way = -1;
 	stack->set = -1;
 	stack->tag = -1;
+	stack->remote_flag = 0;
 
 	/* Return */
 	return stack;
@@ -58,13 +59,20 @@ void mod_stack_return(struct mod_stack_t *stack)
 {
 	int ret_event = stack->ret_event;
 	void *ret_stack = stack->ret_stack;
+	//VMH
+	int remote_flag = stack->remote_flag;
 
 	/* Wake up dependent accesses */
 	mod_stack_wakeup_stack(stack);
 
 	/* Free */
 	free(stack);
-	esim_schedule_event(ret_event, ret_stack, 0);
+
+	//VMH
+	if(remote_flag == 1)
+		esim_schedule_event(ret_event, ret_stack, 10);
+	else
+		esim_schedule_event(ret_event, ret_stack, 0);
 }
 
 

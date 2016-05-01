@@ -114,6 +114,7 @@ struct mod_stack_t
 	int port_locked : 1;
 	// HPS
 	unsigned int update : 1;
+	int remote_flag : 1;
 
 	/* Message sent through interconnect */
 	struct net_msg_t *msg;
