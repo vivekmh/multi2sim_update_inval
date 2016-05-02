@@ -1264,9 +1264,10 @@ void mod_handler_nmoesi_find_and_lock(int event, void *data)
 
 		/* Get high/parent module */
 		parent_mod = linked_list_get(mod->high_mod_list);
-
+		printf("Mod name %s, Parent mod name %s remote_flag %d\n", mod->name, parent_mod->name,
+					stack->remote_flag);
 		//Also update remote_flag here
-		if(stack->hit && !strncmp((const char*)(&mod->name),"mod-l2",6))
+		if(stack->hit && !strstr((const char*)(&mod->name),"l2"))
 		{
 			int len = strlen((const char*)(&mod->name));
 			int len_upper = strlen((const char*)(&parent_mod->name));
