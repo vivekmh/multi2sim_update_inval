@@ -117,6 +117,7 @@ int EV_MOD_NMOESI_MESSAGE_ACTION;
 int EV_MOD_NMOESI_MESSAGE_REPLY;
 int EV_MOD_NMOESI_MESSAGE_FINISH;
 
+int cache_to_cache_transfers;
 
 
 
@@ -1258,25 +1259,32 @@ void mod_handler_nmoesi_find_and_lock(int event, void *data)
 		cache_set_transient_tag(mod->cache, stack->set, stack->way, stack->tag);
 		cache_access_block(mod->cache, stack->set, stack->way);
 
+		//VMH
 		struct mod_t *parent_mod;
 
 		/* Get high/parent module */
 		parent_mod = linked_list_get(mod->high_mod_list);
 
-		//VMH
 		//Also update remote_flag here
-		if(stack->hit && !strncmp(mod->name,"mod-l2",6))
+		if(stack->hit && !strncmp((const char*)(&mod->name),"mod-l2",6))
 		{
-			int len = strlen(mod->name);
-			int len_upper = strlen(parent_mod->name);
-			const char *last_two = &mod->name[len-2];
-			const char *last_two_upper = &parent_mod->name[len_upper-2];
+			int len = strlen((const char*)(&mod->name));
+			int len_upper = strlen((const char*)(&parent_mod->name));
+
+			const char *last_two = (const char*)(&mod->name[len-2]);
+			const char *last_two_upper = (const char*)(&parent_mod->name[len_upper-2]);
+
 			if(strcmp(last_two,last_two_upper))
+				{
+				cache_to_cache_transfers++;
 				stack->remote_flag = 1;
+				}
+
 			printf("Mod name %s, Parent mod name %s remote_flag %d\n", mod->name, parent_mod->name,
 					stack->remote_flag);
 		}
 		//VMH
+
 
 		/* Access latency */
 		esim_schedule_event(EV_MOD_NMOESI_FIND_AND_LOCK_ACTION, stack, mod->dir_latency);

@@ -22,7 +22,7 @@
 
 
 /* NMOESI Event-Driven Simulation */
-
+extern int cache_to_cache_transfers;
 extern int EV_MOD_NMOESI_LOAD;
 extern int EV_MOD_NMOESI_LOAD_LOCK;
 extern int EV_MOD_NMOESI_LOAD_ACTION;
