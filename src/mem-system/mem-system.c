@@ -355,8 +355,8 @@ void mem_system_dump_report(void)
 	fprintf(f, ";    Reads, Writes, NCWrites - Total read/write accesses\n");
 	fprintf(f, ";    BlockingReads, BlockingWrites, BlockingNCWrites - Reads/writes coming from lower-level cache\n");
 	fprintf(f, ";    NonBlockingReads, NonBlockingWrites, NonBlockingNCWrites - Coming from upper-level cache\n");
-	fprintf(f, "Cache-to-Cache Transfers = %d\n", cache_to_cache_transfers);
 	fprintf(f, "\n\n");
+	fprintf(f, "Cache-to-Cache Transfers = %d\n", cache_to_cache_transfers);
 	
 	/* Report for each cache */
 	for (i = 0; i < list_count(mem_system->mod_list); i++)

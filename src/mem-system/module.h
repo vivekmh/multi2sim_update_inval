@@ -86,6 +86,7 @@ struct mod_t
 	/* Parameters */
 	enum mod_kind_t kind;
 	char *name;
+	char *parent_name;
 	int block_size;
 	int log_block_size;
 	int latency;
