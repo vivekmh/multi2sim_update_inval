@@ -484,9 +484,10 @@ void mod_handler_nmoesi_store(int event, void *data)
 		new_stack->peer = mod_stack_set_peer(mod, stack->state);
 		new_stack->target_mod = mod_get_low_mod(mod, stack->tag);
 		new_stack->request_dir = mod_request_up_down;
-		new_stack->update = (stack->state == cache_block_shared || stack->state == cache_block_owned) ? 1 : 0;
-		if(new_stack->update)
-			printf("store %s, stack-update= %d, state =%d, tag=%d\n",mod->name,new_stack->update,stack->state, stack->tag);
+		//new_stack->update = (stack->state == cache_block_shared || stack->state == cache_block_owned) ? 1 : 0;
+		new_stack->update = 1;
+		//if(new_stack->update)
+		//	printf("store %s, stack-update= %d, state =%d, tag=%d\n",mod->name,new_stack->update,stack->state, stack->tag);
 		esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
 
 		/* The prefetcher may be interested in this miss */
@@ -1268,26 +1269,37 @@ void mod_handler_nmoesi_find_and_lock(int event, void *data)
 				//mod->parent_name,stack->remote_flag);
 
 		//Also update remote_flag here
-		char *ret;
-		ret = strstr((const char*)(&mod->name),"l2");
-		if(ret)
-		printf("ret string is %s",ret);
+		//char *ret;
+		//printf("Mod name %s, Parent mod name %s remote_flag %d\n", mod->name, mod->parent_name,
+					//stack->remote_flag);
+		//int ret_cmp=0;
+		int ret_cmp=(strstr(mod->name,"l2"))?1:0;		
 
-		if(stack->hit && ret)
+		/*if(strstr(mod->name,"l2"))
+		{
+			ret_cmp=1;
+		printf("ret string matched");
+		}*/
+
+		if(stack->hit && ret_cmp && mod->parent_name)
 		{
 			int len = strlen((const char*)(&mod->name));
 			int len_upper = strlen((const char*)(&mod->parent_name));
 
-			const char *last_two = (const char*)(&mod->name[len-2]);
-			const char *last_two_upper = (const char*)(&mod->parent_name[len_upper-2]);
+			const char *last_two = (const char*)(&mod->name[len+2]);
+			const char *last_two_upper = (const char*)(&mod->parent_name[len_upper+2]);
 
+			printf("mod last two is %s and parent last two is %s\n", last_two, last_two_upper);
+			printf("mod last two is %d and parent last two is %d\n", len+2, len_upper+2);
 			if(strcmp(last_two,last_two_upper))
 				{
 				cache_to_cache_transfers++;
 				stack->remote_flag = 1;
 				}
+			else
+				stack->remote_flag = 0;
 
-			printf("Mod name %s, Parent mod name %s remote_flag %d\n", mod->name, mod->parent_name,
+			printf("Mod name %s, Parent mod name %s remote_flag %u\n", mod->name, mod->parent_name,
 					stack->remote_flag);
 		}
 		//VMH
