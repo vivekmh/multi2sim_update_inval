@@ -2,3 +2,4 @@
 Cores = 4
 Threads = 1
 #FastForward = 1000000000
+FastForward = 50000000
