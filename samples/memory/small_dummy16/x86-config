@@ -1,0 +1,4 @@
+[ General ]
+Cores = 16
+Threads = 1
+FastForward = 1000000000
