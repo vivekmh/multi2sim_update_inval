@@ -1289,8 +1289,8 @@ void mod_handler_nmoesi_find_and_lock(int event, void *data)
 			const char *last_two = (const char*)(&mod->name[len+2]);
 			const char *last_two_upper = (const char*)(&mod->parent_name[len_upper+2]);
 
-			printf("mod last two is %s and parent last two is %s\n", last_two, last_two_upper);
-			printf("mod last two is %d and parent last two is %d\n", len+2, len_upper+2);
+			//printf("mod last two is %s and parent last two is %s\n", last_two, last_two_upper);
+			//printf("mod last two is %d and parent last two is %d\n", len+2, len_upper+2);
 			if(strcmp(last_two,last_two_upper))
 				{
 				cache_to_cache_transfers++;
@@ -1299,8 +1299,8 @@ void mod_handler_nmoesi_find_and_lock(int event, void *data)
 			else
 				stack->remote_flag = 0;
 
-			printf("Mod name %s, Parent mod name %s remote_flag %u\n", mod->name, mod->parent_name,
-					stack->remote_flag);
+			//printf("Mod name %s, Parent mod name %s remote_flag %u\n", mod->name, mod->parent_name,
+			//		stack->remote_flag);
 		}
 		//VMH
 
@@ -2509,10 +2509,10 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 		new_stack->way = stack->way;
 		new_stack->peer = mod_stack_set_peer(stack->peer, stack->state);
 		new_stack->update = stack->update;
-		if(new_stack->update)
+		/*if(new_stack->update)
 		{
 			printf("calling from write req action to invalidate :new_stack=%s, stack->state=%d\n",new_stack->mod->name,new_stack->state);
-		}
+		}*/
 	    esim_schedule_event(EV_MOD_NMOESI_INVALIDATE, new_stack, 0);
 		return;
 	}
@@ -2716,7 +2716,7 @@ void mod_handler_nmoesi_write_request(int event, void *data)
 		}
 		else 
 		{
-			printf("invalidated the %s with tag %d\n",mod->name, stack->tag);
+			//printf("invalidated the %s with tag %d\n",mod->name, stack->tag);
 			fatal("Invalid cache block state: %d\n", stack->state);
 		}
 
@@ -2919,7 +2919,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 				{
 				//printf("counter=%d\n", dir_entry->counter);
 
-				printf("in update\n");
+				//printf("in update\n");
 				for (i = 0; i < dir->num_nodes; i++)
 				{
 					struct net_node_t *node;
@@ -2947,7 +2947,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 					// HPS
 					new_stack->update = stack->update;
 					esim_schedule_event(EV_MOD_NMOESI_WRITE_REQUEST, new_stack, 0);
-					printf("scheduled write request for %s, i= %d, state=%d\n", new_stack->target_mod->name,i,new_stack->state);
+					//printf("scheduled write request for %s, i= %d, state=%d\n", new_stack->target_mod->name,i,new_stack->state);
 					stack->pending++;
 				}
 			}
@@ -3042,7 +3042,7 @@ void mod_handler_nmoesi_invalidate(int event, void *data)
 			assert(stack->pending > 0);
 			stack->pending--;
 
-			printf("stack->reply=%d, update finish %s, pending=%d, stack->state=%d\n",stack->reply, stack->mod->name,stack->pending,stack->state);
+			//printf("stack->reply=%d, update finish %s, pending=%d, stack->state=%d\n",stack->reply, stack->mod->name,stack->pending,stack->state);
 			mem_debug("  %lld %lld 0x%x %s update finish with state %s\n", esim_time, stack->id,
 							stack->tag, mod->name,str_map_value(&cache_block_state_map, stack->state));
 			if (stack->pending)
